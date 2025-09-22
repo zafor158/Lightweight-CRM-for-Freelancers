@@ -31,7 +31,8 @@ app.use(limiter);
 // CORS configuration
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:3000',
-  'https://your-app-name.vercel.app', // Replace with your actual Vercel URL
+  'https://lightweight-crm-freelancers.vercel.app', // Your Vercel URL
+  'https://lightweight-crm-freelancers-git-main.vercel.app', // Preview URL
   'http://localhost:3000'
 ];
 
