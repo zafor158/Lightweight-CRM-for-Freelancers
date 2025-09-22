@@ -12,7 +12,10 @@ import {
   LogOut,
   Settings,
   ChevronDown,
-  Bell
+  Bell,
+  BarChart3,
+  CreditCard,
+  Zap
 } from 'lucide-react';
 
 const Layout = () => {

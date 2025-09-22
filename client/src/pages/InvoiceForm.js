@@ -61,29 +61,6 @@ const InvoiceForm = () => {
     }
   };
 
-  const fetchInvoice = async () => {
-    try {
-      const response = await axios.get(`/api/invoices/${id}`);
-      if (response.data.invoice) {
-        const invoice = response.data.invoice;
-        setFormData({
-          project_id: invoice.project_id || '',
-          amount: invoice.amount || '',
-          due_date: invoice.due_date ? invoice.due_date.split('T')[0] : '',
-          description: invoice.description || '',
-          status: invoice.status || 'Draft',
-          tax_rate: invoice.tax_rate || '0',
-          discount: invoice.discount || '0',
-          notes: invoice.notes || '',
-          payment_terms: invoice.payment_terms || '30',
-          currency: invoice.currency || 'USD'
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching invoice:', error);
-      toast.error('Failed to fetch invoice details');
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;

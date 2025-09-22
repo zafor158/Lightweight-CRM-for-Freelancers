@@ -128,7 +128,7 @@ const Clients = () => {
         sortOrder === 'asc' ? (
           <ChevronUp className="w-4 h-4 text-gray-400" />
         ) : (
-          <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+          <ChevronDown className="w-4 h-4 text-gray-400" />
         )
       ) : (
         <ArrowUpDown className="w-4 h-4 text-gray-400" />

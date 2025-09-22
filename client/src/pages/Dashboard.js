@@ -12,7 +12,8 @@ import {
   CheckCircle,
   ArrowUpRight,
   ArrowDownRight,
-  Target
+  Target,
+  Eye
 } from 'lucide-react';
 
 const Dashboard = () => {
