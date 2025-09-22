@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Edit, Trash2, Plus, Calendar, DollarSign, Clock, CheckCircle, AlertCircle, Pause } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
@@ -12,7 +12,7 @@ const ProjectDetail = () => {
 
   const fetchProject = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/projects/${id}`);
+      const response = await api.get(`/projects/${id}`);
       setProject(response.data.project);
     } catch (error) {
       console.error('Error fetching project:', error);

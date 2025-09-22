@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Edit, Trash2, Plus, Mail, Phone, Building, MapPin, FileText } from 'lucide-react';
 
@@ -9,15 +9,9 @@ const ClientDetail = () => {
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) {
-      fetchClient();
-    }
-  }, [id, fetchClient]);
-
   const fetchClient = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/clients/${id}`);
+      const response = await api.get(`/clients/${id}`);
       setClient(response.data.client);
     } catch (error) {
       console.error('Error fetching client:', error);
@@ -26,6 +20,12 @@ const ClientDetail = () => {
       setLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchClient();
+    }
+  }, [id, fetchClient]);
 
   if (loading) {
     return (

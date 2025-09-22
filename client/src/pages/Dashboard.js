@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import toast from 'react-hot-toast';
 import { 
   Users, 
   FolderOpen, 
@@ -17,7 +15,7 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalClients: 4,
     totalProjects: 8,
     totalInvoices: 12,
@@ -28,18 +26,18 @@ const Dashboard = () => {
     activeProjects: 5,
     completedProjects: 3
   });
-  const [recentActivity, setRecentActivity] = useState([
+  const [recentActivity] = useState([
     { id: 1, type: 'invoice', action: 'Invoice #INV-001 was paid', time: '2 hours ago', icon: CheckCircle, color: 'text-green-600' },
     { id: 2, type: 'project', action: 'Project "Website Redesign" was completed', time: '4 hours ago', icon: Target, color: 'text-blue-600' },
     { id: 3, type: 'client', action: 'New client "Acme Corp" was added', time: '1 day ago', icon: Users, color: 'text-purple-600' },
     { id: 4, type: 'invoice', action: 'Invoice #INV-002 was sent', time: '2 days ago', icon: FileText, color: 'text-orange-600' }
   ]);
-  const [upcomingDeadlines, setUpcomingDeadlines] = useState([
+  const [upcomingDeadlines] = useState([
     { id: 1, title: 'Project: Mobile App Design', deadline: '2024-01-15', type: 'project', priority: 'high' },
     { id: 2, title: 'Invoice: #INV-003 Payment Due', deadline: '2024-01-18', type: 'invoice', priority: 'medium' },
     { id: 3, title: 'Client Meeting: Acme Corp', deadline: '2024-01-20', type: 'meeting', priority: 'low' }
   ]);
-  const [recentClients, setRecentClients] = useState([
+  const [recentClients] = useState([
     { id: 1, name: 'Lisa Rodriguez', company: 'Verde Sustainability Consulting' },
     { id: 2, name: 'Michael Chen', company: 'TechFlow Innovations' },
     { id: 3, name: 'Sarah Johnson', company: 'Johnson Marketing Solutions' },

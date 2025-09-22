@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 import { 
   FolderOpen, 
@@ -35,7 +35,7 @@ const Projects = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/projects');
       setProjects(response.data.projects || []);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -48,7 +48,7 @@ const Projects = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
-        await axios.delete(`/api/projects/${id}`);
+        await api.delete(`/projects/${id}`);
         setProjects(projects.filter(project => project.id !== id));
         toast.success('Project deleted successfully');
       } catch (error) {

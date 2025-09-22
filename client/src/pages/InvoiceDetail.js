@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Edit, Trash2, CreditCard, Calendar, DollarSign, FileText, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
@@ -14,7 +14,7 @@ const InvoiceDetail = () => {
 
   const fetchInvoice = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/invoices/${id}`);
+      const response = await api.get(`/invoices/${id}`);
       setInvoice(response.data.invoice);
     } catch (error) {
       console.error('Error fetching invoice:', error);
@@ -49,7 +49,7 @@ const InvoiceDetail = () => {
     
     setPaymentLoading(true);
     try {
-      const response = await axios.post('/api/payments/create-checkout-session', {
+      const response = await api.post('/payments/create-checkout-session', {
         invoiceId: invoice.id,
         amount: parseFloat(invoice.amount)
       });

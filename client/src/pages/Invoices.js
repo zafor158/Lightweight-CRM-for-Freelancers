@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 import { 
   FileText, 
@@ -13,7 +13,6 @@ import {
   User,
   Clock,
   CheckCircle,
-  AlertCircle,
   XCircle,
   ArrowUpDown,
   ChevronDown
@@ -33,7 +32,7 @@ const Invoices = () => {
 
   const fetchInvoices = async () => {
     try {
-      const response = await axios.get('/api/invoices');
+      const response = await api.get('/invoices');
       setInvoices(response.data.invoices || []);
     } catch (error) {
       console.error('Error fetching invoices:', error);
@@ -46,7 +45,7 @@ const Invoices = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
       try {
-        await axios.delete(`/api/invoices/${id}`);
+        await api.delete(`/invoices/${id}`);
         setInvoices(invoices.filter(invoice => invoice.id !== id));
         toast.success('Invoice deleted successfully');
       } catch (error) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Save, FolderOpen, Calendar, DollarSign } from 'lucide-react';
 
@@ -28,24 +28,9 @@ const ProjectForm = () => {
   });
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    fetchClients();
-    
-    if (id && id !== 'new') {
-      setIsEditing(true);
-      fetchProject();
-    } else {
-      // Set default client if provided in URL params
-      const clientId = searchParams.get('client');
-      if (clientId) {
-        setFormData(prev => ({ ...prev, client_id: clientId }));
-      }
-    }
-  }, [id, searchParams]);
-
   const fetchClients = async () => {
     try {
-      const response = await axios.get('/api/clients');
+      const response = await api.get('/clients');
       setClients(response.data.clients);
     } catch (error) {
       console.error('Error fetching clients:', error);
@@ -55,7 +40,7 @@ const ProjectForm = () => {
 
   const fetchProject = async () => {
     try {
-      const response = await axios.get(`/api/projects/${id}`);
+      const response = await api.get(`/projects/${id}`);
       if (response.data.project) {
         const project = response.data.project;
         setFormData({
@@ -79,6 +64,22 @@ const ProjectForm = () => {
       toast.error('Failed to fetch project details');
     }
   };
+
+  useEffect(() => {
+    fetchClients();
+    
+    if (id && id !== 'new') {
+      setIsEditing(true);
+      fetchProject();
+    } else {
+      // Set default client if provided in URL params
+      const clientId = searchParams.get('client');
+      if (clientId) {
+        setFormData(prev => ({ ...prev, client_id: clientId }));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, searchParams]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -155,10 +156,10 @@ const ProjectForm = () => {
       };
 
       if (isEditing) {
-        await axios.put(`/api/projects/${id}`, submitData);
+        await api.put(`/projects/${id}`, submitData);
         toast.success('Project updated successfully!');
       } else {
-        await axios.post('/api/projects', submitData);
+        await api.post('/projects', submitData);
         toast.success('Project created successfully!');
       }
       

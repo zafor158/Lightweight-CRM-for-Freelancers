@@ -9,11 +9,6 @@ const Profile = () => {
     email: user?.email || '',
   });
   const [loading, setLoading] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
 
   const handleChange = (e) => {
     setFormData({

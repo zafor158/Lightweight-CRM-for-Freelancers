@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Save, FileText, Calendar, DollarSign, User } from 'lucide-react';
+import { ArrowLeft, Save, FileText, Calendar, DollarSign } from 'lucide-react';
 
 const InvoiceForm = () => {
   const { id } = useParams();
@@ -27,7 +27,7 @@ const InvoiceForm = () => {
 
   const fetchInvoice = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/invoices/${id}`);
+      const response = await api.get(`/invoices/${id}`);
       setFormData(response.data.invoice);
     } catch (error) {
       console.error('Error fetching invoice:', error);
@@ -44,7 +44,6 @@ const InvoiceForm = () => {
     } else {
       // Set default project if provided in URL params
       const projectId = searchParams.get('project');
-      const clientId = searchParams.get('client');
       if (projectId) {
         setFormData(prev => ({ ...prev, project_id: projectId }));
       }
@@ -53,7 +52,7 @@ const InvoiceForm = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/projects');
       setProjects(response.data.projects);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -133,10 +132,10 @@ const InvoiceForm = () => {
       };
 
       if (isEditing) {
-        await axios.put(`/api/invoices/${id}`, submitData);
+        await api.put(`/invoices/${id}`, submitData);
         toast.success('Invoice updated successfully!');
       } else {
-        await axios.post('/api/invoices', submitData);
+        await api.post('/invoices', submitData);
         toast.success('Invoice created successfully!');
       }
       

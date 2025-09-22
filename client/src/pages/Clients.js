@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 import { 
   Users, 
@@ -69,7 +69,7 @@ const Clients = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this client?')) {
       try {
-        await axios.delete(`/api/clients/${id}`);
+        await api.delete(`/clients/${id}`);
         setClients(clients.filter(client => client.id !== id));
         toast.success('Client deleted successfully');
       } catch (error) {

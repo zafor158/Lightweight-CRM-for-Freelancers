@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 import { 
   CreditCard, 
@@ -38,7 +38,7 @@ const Payments = () => {
     try {
       setLoading(true);
       const [invoicesRes] = await Promise.all([
-        axios.get('/api/invoices')
+        api.get('/invoices')
       ]);
 
       const invoicesData = invoicesRes.data.invoices || [];

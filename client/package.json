@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@babel/runtime": "^7.28.4",
+    "@babel/runtime-corejs3": "^7.28.4",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.5.1",
     "axios": "^1.6.2",
     "date-fns": "^2.30.0",
     "lucide-react": "^0.294.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-hook-form": "^7.48.2",
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.8.1",
@@ -22,7 +24,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "vercel-build": "set CI=false && npm run build"
+    "vercel-build": "CI=false npm run build"
   },
   "eslintConfig": {
     "extends": [
@@ -42,7 +44,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000",
+  "homepage": "/",
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6"

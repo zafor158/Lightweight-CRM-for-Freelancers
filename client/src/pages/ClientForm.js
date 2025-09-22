@@ -1,20 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 import { 
   User, 
   Building, 
-  Mail, 
-  Phone, 
   MapPin, 
-  Globe, 
-  FileText, 
-  CreditCard, 
   MessageSquare,
   Save,
-  ArrowLeft,
-  Plus
+  ArrowLeft
 } from 'lucide-react';
 
 const ClientForm = () => {
@@ -38,7 +32,7 @@ const ClientForm = () => {
 
   const fetchClient = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/clients/${id}`);
+      const response = await api.get(`/clients/${id}`);
       setFormData(response.data.client);
     } catch (error) {
       console.error('Error fetching client:', error);
@@ -66,10 +60,10 @@ const ClientForm = () => {
 
     try {
       if (isEditing) {
-        await axios.put(`/api/clients/${id}`, formData);
+        await api.put(`/clients/${id}`, formData);
         toast.success('Client updated successfully');
       } else {
-        await axios.post('/api/clients', formData);
+        await api.post('/clients', formData);
         toast.success('Client created successfully');
       }
       navigate('/clients');

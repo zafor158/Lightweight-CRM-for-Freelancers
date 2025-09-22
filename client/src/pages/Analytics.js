@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import toast from 'react-hot-toast';
 import { 
   TrendingUp, 
@@ -53,9 +53,9 @@ const Analytics = () => {
     try {
       setLoading(true);
       const [clientsRes, projectsRes, invoicesRes] = await Promise.all([
-        axios.get('/api/clients'),
-        axios.get('/api/projects'),
-        axios.get('/api/invoices')
+        api.get('/clients'),
+        api.get('/projects'),
+        api.get('/invoices')
       ]);
 
       const clients = clientsRes.data.clients || [];
