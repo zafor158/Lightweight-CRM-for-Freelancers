@@ -26,6 +26,6 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "installCommand": "npm install && cd client && npm install",
-  "buildCommand": "cd client && npm run build"
+  "installCommand": "cd client && npm install",
+  "buildCommand": "cd client && npm run vercel-build"
 }
