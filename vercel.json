@@ -19,5 +19,9 @@
       "src": "/(.*)",
       "dest": "/client/build/$1"
     }
-  ]
+  ],
+  "env": {
+    "CI": "false",
+    "DISABLE_ESLINT_PLUGIN": "true"
+  }
 }
