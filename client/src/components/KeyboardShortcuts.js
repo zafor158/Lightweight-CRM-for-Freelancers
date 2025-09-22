@@ -62,6 +62,9 @@ const KeyboardShortcuts = () => {
             event.preventDefault();
             setShowHelp(!showHelp);
             break;
+          default:
+            // No action for other keys
+            break;
         }
       }
 
@@ -70,6 +73,9 @@ const KeyboardShortcuts = () => {
         switch (event.key.toLowerCase()) {
           case 'escape':
             setShowHelp(false);
+            break;
+          default:
+            // No action for other keys
             break;
         }
       }
