@@ -8,6 +8,7 @@ const router = express.Router();
 
 // Register
 router.post('/register', async (req, res) => {
+  let client;
   try {
     const { email, password, name } = req.body;
 
@@ -20,8 +21,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Password must be at least 6 characters long' });
     }
 
+    // Get a client from the pool
+    client = await pool.connect();
+
     // Check if user already exists
-    const existingUser = await pool.query(
+    const existingUser = await client.query(
       'SELECT id FROM users WHERE email = $1',
       [email]
     );
@@ -35,7 +39,7 @@ router.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Create user
-    const result = await pool.query(
+    const result = await client.query(
       'INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING id, email, name, created_at',
       [email, passwordHash, name]
     );
@@ -60,12 +64,35 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    
+    // Handle specific database errors
+    if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+      return res.status(503).json({ 
+        message: 'Database connection failed. Please try again later.' 
+      });
+    }
+    
+    if (error.code === 'ENOTFOUND') {
+      return res.status(503).json({ 
+        message: 'Database server not found. Please check your configuration.' 
+      });
+    }
+    
+    res.status(500).json({ 
+      message: 'Internal server error',
+      ...(process.env.NODE_ENV === 'development' && { error: error.message })
+    });
+  } finally {
+    // Always release the client back to the pool
+    if (client) {
+      client.release();
+    }
   }
 });
 
 // Login
 router.post('/login', async (req, res) => {
+  let client;
   try {
     const { email, password } = req.body;
 
@@ -74,8 +101,11 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
+    // Get a client from the pool
+    client = await pool.connect();
+    
     // Find user
-    const result = await pool.query(
+    const result = await client.query(
       'SELECT id, email, password_hash, name FROM users WHERE email = $1',
       [email]
     );
@@ -111,7 +141,29 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    
+    // Handle specific database errors
+    if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+      return res.status(503).json({ 
+        message: 'Database connection failed. Please try again later.' 
+      });
+    }
+    
+    if (error.code === 'ENOTFOUND') {
+      return res.status(503).json({ 
+        message: 'Database server not found. Please check your configuration.' 
+      });
+    }
+    
+    res.status(500).json({ 
+      message: 'Internal server error',
+      ...(process.env.NODE_ENV === 'development' && { error: error.message })
+    });
+  } finally {
+    // Always release the client back to the pool
+    if (client) {
+      client.release();
+    }
   }
 });
 
