@@ -6,18 +6,15 @@ import {
   Users, 
   Plus, 
   Search, 
-  Filter, 
   Eye, 
   Edit, 
   Trash2, 
-  User,
   Building,
   Mail,
   Phone,
   ChevronDown,
   ArrowUpDown,
-  ChevronUp,
-  ChevronDown as ChevronDownIcon
+  ChevronUp
 } from 'lucide-react';
 
 const Clients = () => {
@@ -68,17 +65,6 @@ const Clients = () => {
     setLoading(false);
   }, []);
 
-  const fetchClients = async () => {
-    try {
-      const response = await axios.get('/api/clients');
-      setClients(response.data.clients || []);
-    } catch (error) {
-      console.error('Error fetching clients:', error);
-      toast.error('Failed to fetch clients');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this client?')) {

@@ -6,22 +6,17 @@ import {
   FileText, 
   Plus, 
   Search, 
-  Filter, 
-  MoreVertical, 
   Eye, 
   Edit, 
   Trash2, 
   Download,
-  Calendar,
-  DollarSign,
   User,
   Clock,
   CheckCircle,
   AlertCircle,
   XCircle,
   ArrowUpDown,
-  ChevronDown,
-  ChevronRight
+  ChevronDown
 } from 'lucide-react';
 
 const Invoices = () => {

@@ -7,28 +7,12 @@ import {
   FolderOpen, 
   FileText, 
   DollarSign, 
-  TrendingUp, 
-  TrendingDown,
   Calendar,
   Clock,
   CheckCircle,
-  AlertCircle,
-  Plus,
   ArrowUpRight,
   ArrowDownRight,
-  BarChart3,
-  PieChart,
-  Activity,
-  Target,
-  Zap,
-  Star,
-  Award,
-  Briefcase,
-  CreditCard,
-  Bell,
-  Eye,
-  Edit,
-  Trash2
+  Target
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -66,67 +50,6 @@ const Dashboard = () => {
     // Simulate loading
     setLoading(false);
   }, []);
-
-  const fetchDashboardData = async () => {
-    try {
-      const [clientsRes, projectsRes, invoicesRes] = await Promise.all([
-        axios.get('/api/clients'),
-        axios.get('/api/projects'),
-        axios.get('/api/invoices')
-      ]);
-
-      const clients = clientsRes.data.clients || [];
-      const projects = projectsRes.data.projects || [];
-      const invoices = invoicesRes.data.invoices || [];
-
-      // Calculate statistics
-      const totalRevenue = invoices
-        .filter(inv => inv.status === 'Paid')
-        .reduce((sum, inv) => sum + parseFloat(inv.amount || 0), 0);
-
-      const paidInvoices = invoices.filter(inv => inv.status === 'Paid').length;
-      const pendingInvoices = invoices.filter(inv => inv.status === 'Sent' || inv.status === 'Draft').length;
-      const overdueInvoices = invoices.filter(inv => inv.status === 'Overdue').length;
-      const activeProjects = projects.filter(proj => proj.status === 'In Progress').length;
-      const completedProjects = projects.filter(proj => proj.status === 'Completed').length;
-
-      setStats({
-        totalClients: clients.length,
-        totalProjects: projects.length,
-        totalInvoices: invoices.length,
-        totalRevenue,
-        paidInvoices,
-        pendingInvoices,
-        overdueInvoices,
-        activeProjects,
-        completedProjects
-      });
-
-      // Recent activity (mock data for now)
-      setRecentActivity([
-        { id: 1, type: 'invoice', action: 'Invoice #INV-001 was paid', time: '2 hours ago', icon: CheckCircle, color: 'text-green-600' },
-        { id: 2, type: 'project', action: 'Project "Website Redesign" was completed', time: '4 hours ago', icon: Target, color: 'text-blue-600' },
-        { id: 3, type: 'client', action: 'New client "Acme Corp" was added', time: '1 day ago', icon: Users, color: 'text-purple-600' },
-        { id: 4, type: 'invoice', action: 'Invoice #INV-002 was sent', time: '2 days ago', icon: FileText, color: 'text-orange-600' }
-      ]);
-
-      // Upcoming deadlines (mock data for now)
-      setUpcomingDeadlines([
-        { id: 1, title: 'Project: Mobile App Design', deadline: '2024-01-15', type: 'project', priority: 'high' },
-        { id: 2, title: 'Invoice: #INV-003 Payment Due', deadline: '2024-01-18', type: 'invoice', priority: 'medium' },
-        { id: 3, title: 'Client Meeting: Acme Corp', deadline: '2024-01-20', type: 'meeting', priority: 'low' }
-      ]);
-
-      // Recent clients
-      setRecentClients(clients.slice(0, 5));
-
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const StatCard = ({ title, value, change, changeType, icon: Icon, color, trend }) => (
     <div className="group bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1">

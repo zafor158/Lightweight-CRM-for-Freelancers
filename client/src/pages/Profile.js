@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Mail, Save, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Save } from 'lucide-react';
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
@@ -9,7 +9,6 @@ const Profile = () => {
     email: user?.email || '',
   });
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -23,12 +22,6 @@ const Profile = () => {
     });
   };
 
-  const handlePasswordChange = (e) => {
-    setPasswordData({
-      ...passwordData,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();

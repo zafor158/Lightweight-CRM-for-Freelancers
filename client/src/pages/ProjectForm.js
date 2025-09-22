@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Save, FolderOpen, Calendar, DollarSign, Clock, User } from 'lucide-react';
+import { ArrowLeft, Save, FolderOpen, Calendar, DollarSign } from 'lucide-react';
 
 const ProjectForm = () => {
   const { id } = useParams();

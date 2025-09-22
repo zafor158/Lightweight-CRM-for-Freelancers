@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -36,13 +36,7 @@ const ClientForm = () => {
 
   const isEditing = id && id !== 'new';
 
-  useEffect(() => {
-    if (isEditing) {
-      fetchClient();
-    }
-  }, [id]);
-
-  const fetchClient = async () => {
+  const fetchClient = useCallback(async () => {
     try {
       const response = await axios.get(`/api/clients/${id}`);
       setFormData(response.data.client);
@@ -50,7 +44,13 @@ const ClientForm = () => {
       console.error('Error fetching client:', error);
       toast.error('Failed to fetch client data');
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (isEditing) {
+      fetchClient();
+    }
+  }, [id, isEditing, fetchClient]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

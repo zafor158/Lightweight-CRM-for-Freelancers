@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -25,6 +25,16 @@ const InvoiceForm = () => {
   });
   const [errors, setErrors] = useState({});
 
+  const fetchInvoice = useCallback(async () => {
+    try {
+      const response = await axios.get(`/api/invoices/${id}`);
+      setFormData(response.data.invoice);
+    } catch (error) {
+      console.error('Error fetching invoice:', error);
+      toast.error('Failed to fetch invoice data');
+    }
+  }, [id]);
+
   useEffect(() => {
     fetchProjects();
     
@@ -39,7 +49,7 @@ const InvoiceForm = () => {
         setFormData(prev => ({ ...prev, project_id: projectId }));
       }
     }
-  }, [id, searchParams]);
+  }, [id, searchParams, fetchInvoice]);
 
   const fetchProjects = async () => {
     try {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
@@ -10,25 +10,9 @@ import {
   Menu, 
   X,
   LogOut,
-  Search,
   Settings,
   ChevronDown,
-  Sun,
-  Moon,
-  Plus,
-  HelpCircle,
-  Bell,
-  ChevronLeft,
-  ChevronRight,
-  Building,
-  ChevronRight as ChevronRightIcon,
-  BarChart3,
-  CreditCard,
-  Calendar,
-  MessageSquare,
-  Zap,
-  Shield,
-  Globe
+  Bell
 } from 'lucide-react';
 
 const Layout = () => {

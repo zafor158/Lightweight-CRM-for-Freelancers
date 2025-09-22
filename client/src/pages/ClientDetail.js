@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -13,9 +13,9 @@ const ClientDetail = () => {
     if (id) {
       fetchClient();
     }
-  }, [id]);
+  }, [id, fetchClient]);
 
-  const fetchClient = async () => {
+  const fetchClient = useCallback(async () => {
     try {
       const response = await axios.get(`/api/clients/${id}`);
       setClient(response.data.client);
@@ -25,7 +25,7 @@ const ClientDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   if (loading) {
     return (

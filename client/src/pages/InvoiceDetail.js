@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -12,11 +12,23 @@ const InvoiceDetail = () => {
   const [loading, setLoading] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
 
+  const fetchInvoice = useCallback(async () => {
+    try {
+      const response = await axios.get(`/api/invoices/${id}`);
+      setInvoice(response.data.invoice);
+    } catch (error) {
+      console.error('Error fetching invoice:', error);
+      toast.error('Failed to fetch invoice details');
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
   useEffect(() => {
     if (id) {
       fetchInvoice();
     }
-  }, [id]);
+  }, [id, fetchInvoice]);
 
   useEffect(() => {
     // Handle payment success/failure from URL params
@@ -30,19 +42,7 @@ const InvoiceDetail = () => {
     } else if (paymentStatus === 'cancelled') {
       toast.error('Payment was cancelled');
     }
-  }, [searchParams, id]);
-
-  const fetchInvoice = async () => {
-    try {
-      const response = await axios.get(`/api/invoices/${id}`);
-      setInvoice(response.data.invoice);
-    } catch (error) {
-      console.error('Error fetching invoice:', error);
-      toast.error('Failed to fetch invoice details');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [searchParams, id, fetchInvoice]);
 
   const handlePayNow = async () => {
     if (!invoice) return;

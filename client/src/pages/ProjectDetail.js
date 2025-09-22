@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -10,13 +10,7 @@ const ProjectDetail = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) {
-      fetchProject();
-    }
-  }, [id]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       const response = await axios.get(`/api/projects/${id}`);
       setProject(response.data.project);
@@ -26,7 +20,13 @@ const ProjectDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchProject();
+    }
+  }, [id, fetchProject]);
 
   const getStatusBadge = (status) => {
     const statusConfig = {
