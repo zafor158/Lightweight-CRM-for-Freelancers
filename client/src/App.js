@@ -18,6 +18,7 @@ import ProjectForm from './pages/ProjectForm';
 import Invoices from './pages/Invoices';
 import InvoiceDetail from './pages/InvoiceDetail';
 import InvoiceForm from './pages/InvoiceForm';
+import InvoiceGenerator from './pages/InvoiceGenerator';
 import InvoiceView from './pages/InvoiceView';
 import Analytics from './pages/Analytics';
 import Payments from './pages/Payments';
@@ -136,6 +137,7 @@ function App() {
               <Route path="projects/:id/edit" element={<ProjectForm />} />
             <Route path="invoices" element={<Invoices />} />
             <Route path="invoices/new" element={<InvoiceForm />} />
+            <Route path="invoices/generator" element={<InvoiceGenerator />} />
             <Route path="invoices/:id" element={<InvoiceDetail />} />
             <Route path="invoices/:id/edit" element={<InvoiceForm />} />
             <Route path="invoice/:id" element={<InvoiceView />} />

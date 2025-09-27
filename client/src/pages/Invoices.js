@@ -15,7 +15,8 @@ import {
   CheckCircle,
   XCircle,
   ArrowUpDown,
-  ChevronDown
+  ChevronDown,
+  Receipt
 } from 'lucide-react';
 
 const Invoices = () => {
@@ -224,16 +225,29 @@ const Invoices = () => {
                 </h1>
                 <p className="text-yellow-200/80 text-lg mt-2">Navigate your financial universe and track payment missions</p>
               </div>
-              <Link
-                to="/invoices/new"
-                className="relative group/btn"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-orange-400/30 rounded-xl blur-sm group-hover/btn:blur-md transition-all duration-300"></div>
-                <div className="relative bg-gradient-to-br from-yellow-500/50 to-orange-400/50 border border-yellow-300/60 rounded-xl px-6 py-3 flex items-center gap-2 hover:from-yellow-500/60 hover:to-orange-400/60 transition-all duration-300 shadow-lg">
-                  <Plus className="w-5 h-5 text-yellow-200" />
-                  <span className="font-semibold text-white">Create Invoice</span>
-                </div>
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  to="/invoices/new"
+                  className="relative group/btn"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/30 to-orange-400/30 rounded-xl blur-sm group-hover/btn:blur-md transition-all duration-300"></div>
+                  <div className="relative bg-gradient-to-br from-yellow-500/50 to-orange-400/50 border border-yellow-300/60 rounded-xl px-6 py-3 flex items-center gap-2 hover:from-yellow-500/60 hover:to-orange-400/60 transition-all duration-300 shadow-lg">
+                    <Plus className="w-5 h-5 text-yellow-200" />
+                    <span className="font-semibold text-white">Create Invoice</span>
+                  </div>
+                </Link>
+                
+                <Link
+                  to="/invoices/generator"
+                  className="relative group/btn"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 to-pink-400/30 rounded-xl blur-sm group-hover/btn:blur-md transition-all duration-300"></div>
+                  <div className="relative bg-gradient-to-br from-purple-500/50 to-pink-400/50 border border-purple-300/60 rounded-xl px-6 py-3 flex items-center gap-2 hover:from-purple-500/60 hover:to-pink-400/60 transition-all duration-300 shadow-lg">
+                    <Receipt className="w-5 h-5 text-purple-200" />
+                    <span className="font-semibold text-white">Invoice Generator</span>
+                  </div>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
