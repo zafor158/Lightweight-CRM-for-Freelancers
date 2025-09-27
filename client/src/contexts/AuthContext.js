@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
           console.error('Auth check failed:', error);
           localStorage.removeItem('token');
+          // Don't redirect here, let the ProtectedRoute handle it
         }
       }
       setLoading(false);

@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NavigationProvider } from './contexts/NavigationContext';
 import NotificationProvider from './components/NotificationSystem';
 import KeyboardShortcuts from './components/KeyboardShortcuts';
+import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -30,13 +31,20 @@ const ProtectedRoute = ({ children }) => {
   
   if (loading) {
     return (
-      <div className="loading">
-        <div>Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading...</p>
+        </div>
       </div>
     );
   }
   
-  return user ? children : <Navigate to="/login" />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
 };
 
 // Public Route component (redirect to dashboard if already logged in)
@@ -45,59 +53,67 @@ const PublicRoute = ({ children }) => {
   
   if (loading) {
     return (
-      <div className="loading">
-        <div>Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading...</p>
+        </div>
       </div>
     );
   }
   
-  return user ? <Navigate to="/dashboard" /> : children;
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <NotificationProvider>
-        <Router>
-          <NavigationProvider>
-          <div className="App">
-            <Toaster 
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  color: '#1f2937',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '16px',
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-                  padding: '16px 20px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                },
-                success: {
-                  iconTheme: {
-                    primary: '#10b981',
-                    secondary: '#ffffff',
+    <ErrorBoundary>
+      <AuthProvider>
+        <NotificationProvider>
+          <Router>
+            <NavigationProvider>
+            <div className="App">
+              <Toaster 
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    color: '#1f2937',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '16px',
+                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                    padding: '16px 20px',
+                    fontSize: '14px',
+                    fontWeight: '500',
                   },
-                },
-                error: {
-                  iconTheme: {
-                    primary: '#ef4444',
-                    secondary: '#ffffff',
+                  success: {
+                    iconTheme: {
+                      primary: '#10b981',
+                      secondary: '#ffffff',
+                    },
                   },
-                },
-                loading: {
-                  iconTheme: {
-                    primary: '#6366f1',
-                    secondary: '#ffffff',
+                  error: {
+                    iconTheme: {
+                      primary: '#ef4444',
+                      secondary: '#ffffff',
+                    },
                   },
-                },
-              }}
-            />
-            <KeyboardShortcuts />
-            <Routes>
+                  loading: {
+                    iconTheme: {
+                      primary: '#6366f1',
+                      secondary: '#ffffff',
+                    },
+                  },
+                }}
+              />
+              <KeyboardShortcuts />
+              <Routes>
             {/* Public routes */}
             <Route 
               path="/login" 
@@ -149,11 +165,12 @@ function App() {
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/dashboard" />} />
             </Routes>
-          </div>
-          </NavigationProvider>
-        </Router>
-        </NotificationProvider>
-    </AuthProvider>
+            </div>
+            </NavigationProvider>
+          </Router>
+          </NotificationProvider>
+        </AuthProvider>
+      </ErrorBoundary>
   );
 }
 

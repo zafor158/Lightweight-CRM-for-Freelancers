@@ -35,7 +35,15 @@ api.interceptors.response.use(
       // Token expired or invalid
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      
+      // Use React Router navigation instead of window.location
+      // This will be handled by the AuthContext and ProtectedRoute
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        // Only redirect if not already on auth pages
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 100);
+      }
     }
     return Promise.reject(error);
   }

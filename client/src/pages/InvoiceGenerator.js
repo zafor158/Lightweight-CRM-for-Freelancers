@@ -46,10 +46,21 @@ const InvoiceGenerator = () => {
   const fetchClients = useCallback(async () => {
     try {
       const response = await api.get('/invoices/generator/clients');
-      setClients(response.data.clients);
+      setClients(response.data.clients || []);
+      
+      if (!response.data.clients || response.data.clients.length === 0) {
+        toast.info('No clients with completed projects found. Create some projects first!');
+      }
     } catch (error) {
       console.error('Error fetching clients:', error);
-      toast.error('Failed to fetch clients');
+      
+      if (error.response?.status === 401) {
+        toast.error('Please log in to access the Invoice Generator');
+      } else if (error.response?.status === 404) {
+        toast.info('No clients found. Create some clients and projects first!');
+      } else {
+        toast.error('Failed to fetch clients. Please try again.');
+      }
     }
   }, []);
 
@@ -57,10 +68,21 @@ const InvoiceGenerator = () => {
   const fetchBillableProjects = useCallback(async (clientId) => {
     try {
       const response = await api.get(`/invoices/generator/clients/${clientId}/projects`);
-      setBillableProjects(response.data.projects);
+      setBillableProjects(response.data.projects || []);
+      
+      if (!response.data.projects || response.data.projects.length === 0) {
+        toast.info('No completed projects available for invoicing for this client');
+      }
     } catch (error) {
       console.error('Error fetching billable projects:', error);
-      toast.error('Failed to fetch billable projects');
+      
+      if (error.response?.status === 401) {
+        toast.error('Please log in to access project data');
+      } else if (error.response?.status === 404) {
+        toast.info('No billable projects found for this client');
+      } else {
+        toast.error('Failed to fetch billable projects. Please try again.');
+      }
     }
   }, []);
 

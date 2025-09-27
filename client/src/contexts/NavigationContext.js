@@ -41,8 +41,10 @@ export const NavigationProvider = ({ children }) => {
     '/projects/:id/edit': { title: 'Edit Project', parent: '/projects/:id', icon: 'Edit' },
     '/invoices': { title: 'Invoices', parent: '/dashboard', icon: 'FileText' },
     '/invoices/new': { title: 'New Invoice', parent: '/invoices', icon: 'Plus' },
+    '/invoices/generator': { title: 'Invoice Generator', parent: '/invoices', icon: 'Receipt' },
     '/invoices/:id': { title: 'Invoice Details', parent: '/invoices', icon: 'FileText' },
     '/invoices/:id/edit': { title: 'Edit Invoice', parent: '/invoices/:id', icon: 'Edit' },
+    '/invoice/:id': { title: 'Invoice View', parent: '/invoices/:id', icon: 'Eye' },
     '/analytics': { title: 'Analytics', parent: '/dashboard', icon: 'TrendingUp' },
     '/payments': { title: 'Payments', parent: '/dashboard', icon: 'CreditCard' },
     '/profile': { title: 'Profile', parent: '/dashboard', icon: 'User' }
