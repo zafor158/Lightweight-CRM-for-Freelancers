@@ -139,7 +139,7 @@ const Notification = ({ notification, onRemove }) => {
   };
 
   const getStyles = () => {
-    const baseStyles = "bg-white border-l-4 shadow-lg rounded-lg p-4 transform transition-all duration-300 ease-in-out";
+    const baseStyles = "bg-black/40 backdrop-blur-xl border-l-4 border-white/10 shadow-lg rounded-lg p-4 transform transition-all duration-300 ease-in-out";
     
     if (!isVisible) {
       return `${baseStyles} translate-x-full opacity-0`;

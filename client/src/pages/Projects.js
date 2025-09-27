@@ -1,168 +1,427 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../config/axios';
-import toast from 'react-hot-toast';
 import { 
   FolderOpen, 
   Plus, 
   Search, 
-  Filter, 
   Eye, 
   Edit, 
   Trash2, 
   Calendar,
   User,
   DollarSign,
+  Grid3X3,
+  List,
+  Filter,
+  SortAsc,
+  SortDesc,
+  Clock,
   CheckCircle,
-  ArrowUpDown,
-  ChevronDown,
-  Play,
-  Pause,
-  XCircle
+  AlertCircle,
+  MoreHorizontal
 } from 'lucide-react';
+import Modal from '../components/ui/Modal';
 
 const Projects = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Sample data for demonstration
+  const sampleProjects = [
+    {
+      id: 1,
+      name: 'Website Redesign',
+      client: 'Acme Corp',
+      clientId: 1,
+      dueDate: '2024-01-15',
+      status: 'in-progress',
+      priority: 'high',
+      budget: 15000,
+      progress: 65,
+      description: 'Complete redesign of the company website with modern UI/UX'
+    },
+    {
+      id: 2,
+      name: 'Mobile App Development',
+      client: 'TechFlow Innovations',
+      clientId: 2,
+      dueDate: '2024-02-20',
+      status: 'in-progress',
+      priority: 'medium',
+      budget: 25000,
+      progress: 30,
+      description: 'Native mobile app for iOS and Android platforms'
+    },
+    {
+      id: 3,
+      name: 'Brand Identity Package',
+      client: 'StartupXYZ',
+      clientId: 3,
+      dueDate: '2024-01-10',
+      status: 'completed',
+      priority: 'low',
+      budget: 8000,
+      progress: 100,
+      description: 'Complete brand identity including logo, colors, and guidelines'
+    },
+    {
+      id: 4,
+      name: 'E-commerce Platform',
+      client: 'RetailPlus',
+      clientId: 4,
+      dueDate: '2023-12-30',
+      status: 'overdue',
+      priority: 'high',
+      budget: 35000,
+      progress: 80,
+      description: 'Full e-commerce solution with payment integration'
+    },
+    {
+      id: 5,
+      name: 'Marketing Campaign',
+      client: 'Johnson Marketing',
+      clientId: 3,
+      dueDate: '2024-03-15',
+      status: 'todo',
+      priority: 'medium',
+      budget: 12000,
+      progress: 0,
+      description: 'Digital marketing campaign for product launch'
+    },
+    {
+      id: 6,
+      name: 'Database Migration',
+      client: 'Acme Corp',
+      clientId: 1,
+      dueDate: '2024-02-05',
+      status: 'todo',
+      priority: 'low',
+      budget: 18000,
+      progress: 0,
+      description: 'Migrate legacy database to cloud infrastructure'
+    }
+  ];
+
+  const [projects, setProjects] = useState(sampleProjects);
+  const [loading, setLoading] = useState(false);
+  const [viewMode, setViewMode] = useState('table'); // 'table' or 'kanban'
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [sortBy, setSortBy] = useState('dueDate');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
-    fetchProjects();
+    setLoading(false);
   }, []);
 
-  const fetchProjects = async () => {
-    try {
-      const response = await api.get('/projects');
-      setProjects(response.data.projects || []);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      toast.error('Failed to fetch projects');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
+  const handleDelete = async (project) => {
+    if (window.confirm(`Are you sure you want to delete "${project.name}"?`)) {
       try {
-        await api.delete(`/projects/${id}`);
-        setProjects(projects.filter(project => project.id !== id));
-        toast.success('Project deleted successfully');
+        // await api.delete(`/projects/${project.id}`);
+        setProjects(projects.filter(p => p.id !== project.id));
+        // toast.success('Project deleted successfully');
       } catch (error) {
         console.error('Error deleting project:', error);
-        toast.error('Failed to delete project');
+        // toast.error('Failed to delete project');
       }
     }
   };
-
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      'In Progress': { color: 'bg-blue-100 text-blue-800 border-blue-200', icon: Play },
-      'Completed': { color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle },
-      'On Hold': { color: 'bg-orange-100 text-orange-800 border-orange-200', icon: Pause },
-      'Overdue': { color: 'bg-red-100 text-red-800 border-red-200', icon: XCircle },
-    };
-    
-    const config = statusConfig[status] || statusConfig['In Progress'];
-    const Icon = config.icon;
-    
-    return (
-      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${config.color}`}>
-        <Icon className="w-3 h-3 mr-1.5" />
-        {status}
-      </span>
-    );
-  };
-
-  const getPriorityBadge = (priority) => {
-    const priorityConfig = {
-      'High': { color: 'bg-red-100 text-red-800' },
-      'Medium': { color: 'bg-yellow-100 text-yellow-800' },
-      'Low': { color: 'bg-green-100 text-green-800' },
-      'Urgent': { color: 'bg-purple-100 text-purple-800' },
-    };
-    
-    const config = priorityConfig[priority] || priorityConfig['Medium'];
-    
-    return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
-        {priority}
-      </span>
-    );
-  };
-
-  const filteredProjects = projects.filter(project => {
-    const matchesSearch = 
-      project.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.client_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  }).sort((a, b) => {
-    let aValue, bValue;
-    
-    switch (sortBy) {
-      case 'total_amount':
-        aValue = parseFloat(a.total_amount || 0);
-        bValue = parseFloat(b.total_amount || 0);
-        break;
-      case 'due_date':
-        aValue = new Date(a.due_date || 0);
-        bValue = new Date(b.due_date || 0);
-        break;
-      case 'created_at':
-        aValue = new Date(a.created_at);
-        bValue = new Date(b.created_at);
-        break;
-      default:
-        aValue = a[sortBy] || '';
-        bValue = b[sortBy] || '';
-    }
-    
-    if (sortOrder === 'asc') {
-      return aValue > bValue ? 1 : -1;
-    } else {
-      return aValue < bValue ? 1 : -1;
-    }
-  });
 
   const handleSort = (column) => {
     if (sortBy === column) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortBy(column);
-      setSortOrder('desc');
+      setSortOrder('asc');
     }
   };
 
-  const SortButton = ({ column, children }) => (
-    <button
-      onClick={() => handleSort(column)}
-      className="flex items-center space-x-1 text-left font-medium text-gray-900 hover:text-gray-700 transition-colors"
-    >
-      <span>{children}</span>
-      <ArrowUpDown className="w-4 h-4 text-gray-400" />
-    </button>
+  const filteredProjects = projects
+    .filter(project => {
+      const matchesSearch = 
+        project.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.client?.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesSearch;
+    })
+    .sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+      
+      if (sortBy === 'dueDate') {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      }
+      
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+  const getStatusBadge = (status) => {
+    const styles = {
+      'todo': 'bg-gray-100 text-gray-700',
+      'in-progress': 'bg-warning-100 text-warning-700',
+      'completed': 'bg-success-100 text-success-700',
+      'overdue': 'bg-error-100 text-error-700'
+    };
+    
+    const labels = {
+      'todo': 'To Do',
+      'in-progress': 'In Progress',
+      'completed': 'Completed',
+      'overdue': 'Overdue'
+    };
+
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status]}`}>
+        {labels[status]}
+      </span>
+    );
+  };
+
+  const getPriorityColor = (priority) => {
+    const colors = {
+      high: 'text-error-600',
+      medium: 'text-warning-600',
+      low: 'text-success-600'
+    };
+    return colors[priority] || 'text-gray-600';
+  };
+
+  const getSortIcon = (column) => {
+    if (sortBy !== column) {
+      return <SortAsc className="w-4 h-4 text-gray-400" />;
+    }
+    return sortOrder === 'asc' ? 
+      <SortAsc className="w-4 h-4 text-gray-600" /> : 
+      <SortDesc className="w-4 h-4 text-gray-600" />;
+  };
+
+  const getProjectsByStatus = (status) => {
+    return filteredProjects.filter(project => project.status === status);
+  };
+
+  const renderKanbanView = () => {
+    const columns = [
+      { id: 'todo', title: 'Mission Briefing', color: 'gray' },
+      { id: 'in-progress', title: 'In Progress', color: 'warning' },
+      { id: 'completed', title: 'Mission Complete', color: 'success' }
+    ];
+
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {columns.map((column) => (
+          <div key={column.id} className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold space-text-primary text-lg">{column.title}</h3>
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                column.color === 'gray' ? 'bg-gray-500/20 text-gray-300' :
+                column.color === 'warning' ? 'bg-yellow-500/20 text-yellow-300' :
+                'bg-green-500/20 text-green-300'
+              }`}>
+                {getProjectsByStatus(column.id).length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {getProjectsByStatus(column.id).map((project) => (
+                <div
+                  key={project.id}
+                  className="space-card space-card-hover p-4 cursor-pointer group"
+                  onClick={() => setSelectedProject(project)}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <h4 className="font-semibold space-text-primary group-hover:text-purple-300 transition-colors">
+                        {project.name}
+                      </h4>
+                      <div className={`w-3 h-3 rounded-full ${
+                        project.priority === 'high' ? 'bg-red-500' :
+                        project.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                      }`} />
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm space-text-secondary">
+                      <User className="w-4 h-4" />
+                      <span>{project.client}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm space-text-secondary">
+                      <Calendar className="w-4 h-4" />
+                      <span>Due {new Date(project.dueDate).toLocaleDateString()}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm space-text-secondary">
+                      <DollarSign className="w-4 h-4" />
+                      <span>${project.budget.toLocaleString()}</span>
+                    </div>
+
+                    {project.status === 'in-progress' && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="space-text-muted">Progress</span>
+                          <span className="font-semibold space-text-primary">{project.progress}%</span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all"
+                            style={{ width: `${project.progress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderTableView = () => (
+    <div className="space-card">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th 
+                className="cursor-pointer hover:bg-white/5 transition-colors py-4 px-6 text-left"
+                onClick={() => handleSort('name')}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold space-text-primary">Project Name</span>
+                  {getSortIcon('name')}
+                </div>
+              </th>
+              <th 
+                className="cursor-pointer hover:bg-white/5 transition-colors py-4 px-6 text-left"
+                onClick={() => handleSort('client')}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold space-text-primary">Client Name</span>
+                  {getSortIcon('client')}
+                </div>
+              </th>
+              <th 
+                className="cursor-pointer hover:bg-white/5 transition-colors py-4 px-6 text-left"
+                onClick={() => handleSort('dueDate')}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold space-text-primary">Due Date</span>
+                  {getSortIcon('dueDate')}
+                </div>
+              </th>
+              <th className="text-sm font-semibold space-text-primary py-4 px-6 text-left">Status</th>
+              <th className="text-sm font-semibold space-text-primary py-4 px-6 text-left">Priority</th>
+              <th className="text-sm font-semibold space-text-primary py-4 px-6 text-left">Budget</th>
+              <th className="text-sm font-semibold space-text-primary py-4 px-6 text-left">Progress</th>
+              <th className="text-right text-sm font-semibold space-text-primary py-4 px-6">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredProjects.map((project) => (
+              <tr key={project.id} className="hover:bg-white/5 transition-colors border-b border-white/5">
+                <td className="py-4 px-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+                      <FolderOpen className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="font-semibold space-text-primary">{project.name}</div>
+                      <div className="text-sm space-text-muted truncate max-w-48">{project.description}</div>
+                    </div>
+                  </div>
+                </td>
+                <td className="py-4 px-6">
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm space-text-secondary">{project.client}</span>
+                  </div>
+                </td>
+                <td className="py-4 px-6">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm space-text-secondary">
+                      {new Date(project.dueDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                </td>
+                <td className="py-4 px-6">
+                  {getStatusBadge(project.status)}
+                </td>
+                <td className="py-4 px-6">
+                  <span className={`text-sm font-medium ${getPriorityColor(project.priority)}`}>
+                    {project.priority}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
+                  <div className="flex items-center gap-1">
+                    <DollarSign className="w-4 h-4 text-gray-400" />
+                    <span className="font-semibold space-text-primary">
+                      ${project.budget.toLocaleString()}
+                    </span>
+                  </div>
+                </td>
+                <td className="py-4 px-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 bg-gray-700 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full"
+                        style={{ width: `${project.progress}%` }}
+                      />
+                    </div>
+                    <span className="text-sm space-text-muted">{project.progress}%</span>
+                  </div>
+                </td>
+                <td className="py-4 px-6">
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => setSelectedProject(project)}
+                      className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-500/20 rounded-lg transition-colors"
+                      title="View"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <Link
+                      to={`/projects/${project.id}/edit`}
+                      className="p-2 text-gray-400 hover:text-green-400 hover:bg-green-500/20 rounded-lg transition-colors"
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(project)}
+                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200">
-          <div className="p-6">
-            <div className="animate-pulse space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-16 bg-gray-200 rounded"></div>
-              ))}
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          </div>
+          <div className="card">
+            <div className="card-body">
+              <div className="animate-pulse space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="h-16 bg-gray-200 rounded"></div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -171,270 +430,295 @@ const Projects = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 -m-6 lg:-m-8 p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          <div className="space-y-2">
-            <h1 className="text-4xl lg:text-5xl font-bold text-slate-900">Projects</h1>
-            <p className="text-lg text-slate-600 max-w-2xl">
-              Track and manage your client projects and deliverables with comprehensive project management tools.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              to="/projects/new"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 text-lg"
-            >
-              <Plus className="w-6 h-6 mr-3" />
-              Add New Project
-            </Link>
-            <button className="bg-white border border-slate-300 hover:border-slate-400 text-slate-700 px-6 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center shadow-sm hover:shadow-md">
-              <Filter className="w-5 h-5 mr-2" />
-              Advanced Filters
-            </button>
-          </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Enhanced Cosmic Background with Rich Atmospheric Effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-indigo-900/30 to-black/50"></div>
+        
+        {/* Enhanced Animated Star Field */}
+        <div className="absolute inset-0 opacity-30">
+          {[...Array(35)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${2 + Math.random() * 3}s`
+              }}
+            />
+          ))}
         </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600 mb-2">Total Projects</p>
-                <p className="text-3xl font-bold text-slate-900">{projects.length}</p>
-                <p className="text-xs text-slate-500 mt-1">All time projects</p>
-              </div>
-              <div className="p-4 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-2xl">
-                <FolderOpen className="w-8 h-8 text-indigo-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600 mb-2">In Progress</p>
-                <p className="text-3xl font-bold text-slate-900">
-                  {projects.filter(p => p.status === 'In Progress').length}
-                </p>
-                <p className="text-xs text-slate-500 mt-1">Active projects</p>
-              </div>
-              <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl">
-                <Play className="w-8 h-8 text-blue-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600 mb-2">Completed</p>
-                <p className="text-3xl font-bold text-slate-900">
-                  {projects.filter(p => p.status === 'Completed').length}
-                </p>
-                <p className="text-xs text-slate-500 mt-1">Finished projects</p>
-              </div>
-              <div className="p-4 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-2xl">
-                <CheckCircle className="w-8 h-8 text-emerald-600" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600 mb-2">Total Value</p>
-                <p className="text-3xl font-bold text-slate-900">
-                  ${projects.reduce((sum, p) => sum + parseFloat(p.total_amount || 0), 0).toLocaleString()}
-                </p>
-                <p className="text-xs text-slate-500 mt-1">Project value</p>
-              </div>
-              <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl">
-                <DollarSign className="w-8 h-8 text-purple-600" />
-              </div>
-            </div>
-          </div>
+        
+        {/* Large Nebula Effects */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-radial from-purple-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl animate-pulse" style={{animationDuration: '8s'}}></div>
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-radial from-cyan-500/8 via-indigo-500/4 to-transparent rounded-full blur-3xl animate-pulse" style={{animationDuration: '6s', animationDelay: '2s'}}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-radial from-pink-500/5 via-purple-500/2 to-transparent rounded-full blur-2xl animate-pulse" style={{animationDuration: '10s', animationDelay: '4s'}}></div>
         </div>
-
-        {/* Filters and Search */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-6 lg:space-y-0">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
-              <div className="relative w-full sm:w-80">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search projects by name, client, or description..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-slate-50 focus:bg-white transition-colors"
-                />
-              </div>
-              <div className="relative w-full sm:w-48">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full appearance-none pl-4 pr-10 py-4 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-colors"
-                >
-                  <option value="all">All Status</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                  <option value="On Hold">On Hold</option>
-                  <option value="Overdue">Overdue</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={16} />
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <span className="text-sm text-slate-600">
-                {filteredProjects.length} of {projects.length} projects
-              </span>
-            </div>
-          </div>
+        
+        {/* Floating Celestial Bodies */}
+        <div className="absolute top-20 left-20 w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full shadow-md shadow-blue-500/12 animate-float">
+          <div className="absolute inset-1 rounded-full bg-gradient-to-br from-blue-300/20 to-transparent"></div>
         </div>
-
-        {/* Projects Table */}
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-          {filteredProjects.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-8">
-                <FolderOpen className="w-12 h-12 text-slate-400" />
-              </div>
-              <h3 className="text-2xl font-semibold text-slate-900 mb-3">No projects found</h3>
-              <p className="text-slate-600 mb-10 max-w-lg mx-auto text-lg">
-                {searchTerm || statusFilter !== 'all' 
-                  ? 'Try adjusting your search or filter criteria to find projects.' 
-                  : 'Get started by creating your first project to manage your client work.'
-                }
-              </p>
-              {!searchTerm && statusFilter === 'all' && (
-                <Link
-                  to="/projects/new"
-                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-                >
-                  <Plus className="w-6 h-6 mr-3" />
-                  Create Your First Project
-                </Link>
-              )}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-8 py-6 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                      <SortButton column="name">Project Details</SortButton>
-                    </th>
-                    <th className="px-6 py-6 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                      <SortButton column="status">Status</SortButton>
-                    </th>
-                    <th className="px-6 py-6 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                      <SortButton column="client_name">Client</SortButton>
-                    </th>
-                    <th className="px-6 py-6 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                      <SortButton column="due_date">Due Date</SortButton>
-                    </th>
-                    <th className="px-6 py-6 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                      <SortButton column="total_amount">Value</SortButton>
-                    </th>
-                    <th className="px-6 py-6 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Priority</th>
-                    <th className="px-8 py-6 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-slate-200">
-                  {filteredProjects.map((project) => (
-                    <tr key={project.id} className="hover:bg-slate-50 transition-colors duration-200 group">
-                      <td className="px-8 py-6 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-14 h-14 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-2xl flex items-center justify-center mr-5 group-hover:scale-105 transition-transform duration-200">
-                            <FolderOpen className="w-7 h-7 text-indigo-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-base font-semibold text-slate-900 mb-1">
-                              {project.name}
-                            </div>
-                            <div className="text-sm text-slate-500 truncate max-w-sm">
-                              {project.description || 'No description provided'}
-                            </div>
-                            <div className="flex items-center mt-2">
-                              <Calendar className="w-4 h-4 text-slate-400 mr-1" />
-                              <span className="text-xs text-slate-500">
-                                Created {new Date(project.created_at).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6 whitespace-nowrap">
-                        {getStatusBadge(project.status)}
-                      </td>
-                      <td className="px-6 py-6 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-12 h-12 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mr-4">
-                            <User className="w-6 h-6 text-slate-600" />
-                          </div>
-                          <div>
-                            <div className="text-sm font-semibold text-slate-900">
-                              {project.client_name}
-                            </div>
-                            <div className="text-xs text-slate-500">
-                              Client
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6 whitespace-nowrap">
-                        <div className="text-sm font-medium text-slate-900">
-                          {project.due_date ? new Date(project.due_date).toLocaleDateString() : '-'}
-                        </div>
-                        {project.due_date && (
-                          <div className="text-xs text-slate-500 mt-1">
-                            {new Date(project.due_date) > new Date() ? 'Upcoming' : 'Overdue'}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-6 whitespace-nowrap">
-                        <div className="text-lg font-bold text-slate-900">
-                          ${parseFloat(project.total_amount || 0).toLocaleString()}
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          Project value
-                        </div>
-                      </td>
-                      <td className="px-6 py-6 whitespace-nowrap">
-                        {getPriorityBadge(project.priority)}
-                      </td>
-                      <td className="px-8 py-6 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end space-x-2">
-                          <Link
-                            to={`/projects/${project.id}`}
-                            className="p-3 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
-                            title="View Project Details"
-                          >
-                            <Eye className="w-5 h-5" />
-                          </Link>
-                          <Link
-                            to={`/projects/${project.id}/edit`}
-                            className="p-3 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all duration-200 group"
-                            title="Edit Project"
-                          >
-                            <Edit className="w-5 h-5" />
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(project.id)}
-                            className="p-3 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group"
-                            title="Delete Project"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+        
+        <div className="absolute top-40 right-32 w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full shadow-sm shadow-purple-500/12 animate-float" style={{animationDelay: '1s'}}>
+          <div className="absolute inset-1 rounded-full bg-gradient-to-br from-purple-300/12 to-transparent"></div>
+        </div>
+        
+        <div className="absolute bottom-32 left-1/3 w-6 h-6 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full shadow-sm shadow-emerald-500/12 animate-float" style={{animationDelay: '2s'}}></div>
+        
+        {/* Animated Meteor Streaks */}
+        <div className="absolute top-1/4 right-1/3 w-1 h-12 bg-gradient-to-b from-transparent via-white to-transparent transform rotate-45 opacity-20 animate-pulse" style={{animationDelay: '3s'}}></div>
+        <div className="absolute bottom-1/3 left-1/4 w-1 h-8 bg-gradient-to-b from-transparent via-cyan-200 to-transparent transform -rotate-45 opacity-12 animate-pulse" style={{animationDelay: '5s'}}></div>
+        
+        {/* Enhanced floating particles */}
+        <div className="absolute inset-0 opacity-18">
+          {[...Array(10)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`
+              }}
+            />
+          ))}
         </div>
       </div>
+
+      <div className="max-w-7xl mx-auto p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 relative">
+        {/* Page Header - Electric Purple & Neon Pink */}
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-400/25 via-fuchsia-300/20 to-pink-400/15 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 animate-pulse" style={{animationDuration: '6s'}}></div>
+          <div className="relative backdrop-blur-2xl bg-gradient-to-br from-zinc-800/45 via-purple-900/40 to-fuchsia-900/35 border-2 border-purple-400/60 rounded-2xl p-4 sm:p-6 shadow-2xl shadow-purple-500/30">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+              <div className="flex-1">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white drop-shadow-lg flex items-center gap-2 sm:gap-3">
+                  <FolderOpen className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-purple-300" />
+                  <span className="truncate">Mission Control</span>
+                </h1>
+                <p className="text-purple-200/80 text-sm sm:text-base lg:text-lg mt-2">Navigate your project universe and track mission progress</p>
+              </div>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="relative group/btn w-full sm:w-auto"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 to-fuchsia-400/30 rounded-xl blur-sm group-hover/btn:blur-md transition-all duration-300"></div>
+                <div className="relative bg-gradient-to-br from-purple-500/50 to-fuchsia-400/50 border border-purple-300/60 rounded-xl px-4 sm:px-6 py-2 sm:py-3 flex items-center justify-center gap-2 hover:from-purple-500/60 hover:to-fuchsia-400/60 transition-all duration-300 shadow-lg">
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-purple-200" />
+                  <span className="font-semibold text-white text-sm sm:text-base">Launch New Project</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Search, Filters, and View Toggle - Neon Green & Electric Lime */}
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 via-lime-300/15 to-emerald-400/10 rounded-2xl blur-lg group-hover:blur-xl transition-all duration-500 animate-pulse" style={{animationDuration: '7s', animationDelay: '1s'}}></div>
+          <div className="relative backdrop-blur-2xl bg-gradient-to-br from-neutral-800/40 via-green-900/35 to-lime-900/30 border-2 border-green-400/50 rounded-2xl p-6 shadow-2xl shadow-green-500/25">
+            <div className="flex items-center justify-between">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-300" />
+                <input
+                  type="text"
+                  placeholder="Search projects..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-slate-800/50 border border-green-400/30 rounded-xl text-white placeholder-green-200/60 focus:outline-none focus:border-green-300/60 focus:bg-slate-800/70 transition-all duration-300"
+                />
+              </div>
+              <div className="flex items-center gap-4">
+                <button className="relative group/btn">
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/30 to-lime-400/30 rounded-lg blur-sm group-hover/btn:blur-md transition-all duration-300"></div>
+                  <div className="relative bg-gradient-to-br from-green-500/40 to-lime-400/40 border border-green-300/50 rounded-lg px-4 py-2 flex items-center gap-2 hover:from-green-500/50 hover:to-lime-400/50 transition-all duration-300 shadow-lg">
+                    <Filter className="w-4 h-4 text-green-200" />
+                    <span className="text-white font-medium">Filters</span>
+                  </div>
+                </button>
+                <div className="flex items-center bg-slate-800/50 border border-green-400/30 rounded-xl p-1">
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className={`p-2 rounded-lg transition-colors ${
+                      viewMode === 'table'
+                        ? 'bg-green-500/50 text-white border border-green-300/50'
+                        : 'text-green-300 hover:text-green-200 hover:bg-green-500/20'
+                    }`}
+                    title="Table View"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('kanban')}
+                    className={`p-2 rounded-lg transition-colors ${
+                      viewMode === 'kanban'
+                        ? 'bg-green-500/50 text-white border border-green-300/50'
+                        : 'text-green-300 hover:text-green-200 hover:bg-green-500/20'
+                    }`}
+                    title="Kanban View"
+                  >
+                    <Grid3X3 className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="text-sm text-green-200/80 font-medium">
+                  {filteredProjects.length} of {projects.length} projects
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Projects Content */}
+        {viewMode === 'table' ? renderTableView() : renderKanbanView()}
+
+        {/* Empty State */}
+        {filteredProjects.length === 0 && (
+          <div className="text-center py-12">
+            <FolderOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No projects found</h3>
+            <p className="text-gray-600 mb-6">
+              {searchTerm 
+                ? 'Try adjusting your search criteria.' 
+                : 'Get started by creating your first project.'
+              }
+            </p>
+            {!searchTerm && (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="btn btn-primary"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Project
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Add Project Modal */}
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Create New Project"
+        size="lg"
+      >
+        <form className="space-y-4 sm:space-y-6">
+          {/* Project Name and Client Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-bold text-cyan-200">
+                Project Name *
+              </label>
+              <input
+                type="text"
+                required
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-800/50 border border-cyan-400/30 rounded-xl text-white placeholder-cyan-200/60 focus:outline-none focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-500/30 transition-all duration-300"
+                placeholder="Enter project name"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-bold text-cyan-200">
+                Client *
+              </label>
+              <select className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-800/50 border border-cyan-400/30 rounded-xl text-white focus:outline-none focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-500/30 transition-all duration-300">
+                <option value="">Select a client</option>
+                <option value="acme">Acme Corp</option>
+                <option value="techflow">TechFlow Innovations</option>
+                <option value="startup">StartupXYZ</option>
+              </select>
+            </div>
+          </div>
+          
+          {/* Description */}
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-cyan-200">
+              Description
+            </label>
+            <textarea
+              rows={3}
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-800/50 border border-cyan-400/30 rounded-xl text-white placeholder-cyan-200/60 focus:outline-none focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-500/30 transition-all duration-300 resize-none"
+              placeholder="Describe the project..."
+            />
+          </div>
+          
+          {/* Due Date, Priority, and Budget Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-bold text-cyan-200">
+                Due Date
+              </label>
+              <input
+                type="date"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-800/50 border border-cyan-400/30 rounded-xl text-white focus:outline-none focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-500/30 transition-all duration-300"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-bold text-cyan-200">
+                Priority
+              </label>
+              <select className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-800/50 border border-cyan-400/30 rounded-xl text-white focus:outline-none focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-500/30 transition-all duration-300">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-bold text-cyan-200">
+                Budget
+              </label>
+              <input
+                type="number"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-800/50 border border-cyan-400/30 rounded-xl text-white placeholder-cyan-200/60 focus:outline-none focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-500/30 transition-all duration-300"
+                placeholder="0"
+              />
+            </div>
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 sm:pt-6 border-t border-cyan-400/20">
+            <button
+              type="button"
+              onClick={() => setShowAddModal(false)}
+              className="relative group/btn order-2 sm:order-1"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-500/30 to-slate-400/30 rounded-xl blur-sm group-hover/btn:blur-md transition-all duration-300"></div>
+              <div className="relative bg-gradient-to-br from-gray-500/50 to-slate-400/50 border border-gray-300/60 rounded-xl px-4 sm:px-6 py-2 sm:py-3 flex items-center justify-center gap-2 hover:from-gray-500/60 hover:to-slate-400/60 transition-all duration-300 shadow-lg">
+                <span className="font-semibold text-white text-sm sm:text-base">Cancel</span>
+              </div>
+            </button>
+            <button
+              type="submit"
+              className="relative group/btn order-1 sm:order-2"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/30 to-blue-400/30 rounded-xl blur-sm group-hover/btn:blur-md transition-all duration-300"></div>
+              <div className="relative bg-gradient-to-br from-cyan-500/50 to-blue-400/50 border border-cyan-300/60 rounded-xl px-4 sm:px-6 py-2 sm:py-3 flex items-center justify-center gap-2 hover:from-cyan-500/60 hover:to-blue-400/60 transition-all duration-300 shadow-lg">
+                <Plus className="w-4 h-4 text-cyan-200" />
+                <span className="font-semibold text-white text-sm sm:text-base">Create Project</span>
+              </div>
+            </button>
+          </div>
+        </form>
+      </Modal>
+      
+      {/* Custom CSS for Enhanced Effects */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-8px) rotate(1deg); }
+        }
+        
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        
+        .bg-gradient-radial {
+          background: radial-gradient(circle, var(--tw-gradient-stops));
+        }
+      `}</style>
     </div>
   );
 };
