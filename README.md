@@ -1,4 +1,5 @@
 # 🚀 FreelancePro: Lightweight CRM for Freelancers
+<img width="1901" height="900" alt="image" src="https://github.com/user-attachments/assets/d2e4753e-c86e-4f93-bdc8-f66ab0320a8c" />
 
 <div align="center">
 
