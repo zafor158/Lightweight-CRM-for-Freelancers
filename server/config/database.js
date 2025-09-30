@@ -3,10 +3,13 @@ const { Pool } = require('pg');
 // Try different connection configurations
 let poolConfig;
 
+// Force use of Neon database if DATABASE_URL is provided
 if (process.env.DATABASE_URL) {
+  // Avoid logging sensitive connection strings
+  console.log('Using Neon database connection');
   poolConfig = {
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: { rejectUnauthorized: false }, // Required for Neon database
     max: 10, // Reduced pool size for better stability
     min: 2, // Minimum connections to maintain
     idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
@@ -15,6 +18,7 @@ if (process.env.DATABASE_URL) {
     allowExitOnIdle: true, // Allow the process to exit when all connections are idle
   };
 } else {
+  console.log('No DATABASE_URL found, using fallback configuration');
   poolConfig = {
     user: process.env.DB_USER || 'postgres',
     host: process.env.DB_HOST || 'localhost',
